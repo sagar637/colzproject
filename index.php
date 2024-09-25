@@ -131,7 +131,7 @@ while($rows=$cartTotalResult->fetch_assoc()){
             </div>
             <input type="hidden" name="op" value="login">
             <input type="submit" value="Log In" class="btn">
-            <p class="login-func">forgot password? <a href="#">click here</a></p>
+            <p class="login-func">forgot password? <a href="function/forgetpassword.php">click here</a></p>
             <p class="login-func">don't have an account? <a id="register-btn">create one</a></p>
         </form>
 

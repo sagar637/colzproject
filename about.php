@@ -116,9 +116,11 @@ while($rows=$cartTotalResult->fetch_assoc()){
             </div>
             <input type="hidden" name="op" value="login">
             <input type="submit" value="Log In" class="btn">
-            <p class="login-func">forgot password? <a href="#">click here</a></p>
+            
             <p class="login-func">don't have an account? <a id="register-btn">create one</a></p>
         </form>
+        
+
 
         <form action="function/login.php" method="POST" class="register-form">
             <h3>register</h3>
@@ -149,7 +151,7 @@ while($rows=$cartTotalResult->fetch_assoc()){
         <div class="content">
             <span>welcome to our shop</span>
             <h3>fresh and organic groceries</h3>
-            <p>Welcome to GardenRoots - your one-stop grocery website! Browse our wide selection of fresh produce, pantry staples, and household essentials, all delivered to your doorstep for ultimate convenience.</p>
+            <p>Welcome to Online Grocery Store - your one-stop grocery website! Browse our wide selection of fresh produce, pantry staples, and household essentials, all delivered to your doorstep for ultimate convenience.</p>
             <p>Discover a seamless online shopping experience at QuickGrocers. With speedy delivery, unbeatable prices, and a vast range of products, we make grocery shopping easier than ever before. Happy shopping!</p>
             <a href="" class="btn">read more</a>
         </div>

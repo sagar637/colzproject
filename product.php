@@ -1,31 +1,52 @@
 <?php
 include 'Function/connection.php';  
 
-if($_SESSION["user_id"]==null){
-    $_SESSION["user_id"]="0";
+if($_SESSION["user_id"] == null){
+    $_SESSION["user_id"] = "0";
 }
-$user_id=$_SESSION["user_id"];
+$user_id = $_SESSION["user_id"];
 
 // get cart products
 $cartDisplay = "SELECT * FROM `product` INNER JOIN `cart` ON product.product_id=cart.product_id WHERE cart.user_id='$user_id';";
 $cartDisplayResult = $mysqli->query($cartDisplay);
 
 // get products
-if($_SESSION['filter']!=''){
+if ($_SESSION['filter'] != '') {
     $productDisplay = $_SESSION['filter'];
-}
-else{
+} else {
     $productDisplay = "SELECT * FROM `product`";
 }
+
+// Sorting logic
+if (isset($_GET['sort'])) {
+    switch ($_GET['sort']) {
+        case 'price_asc':
+            $productDisplay .= " ORDER BY `discount` ASC";
+            break;
+        case 'price_desc':
+            $productDisplay .= " ORDER BY `discount` DESC";
+            break;
+        case 'name_asc':
+            $productDisplay .= " ORDER BY `product` ASC";
+            break;
+        case 'name_desc':
+            $productDisplay .= " ORDER BY `product` DESC";
+            break;
+        default:
+            // No sorting
+            break;
+    }
+}
+
 $productDisplayResult = $mysqli->query($productDisplay);
 
-//cart total
+// cart total
 $cartTotal = "SELECT * FROM `cart` INNER JOIN `product` ON product.product_id=cart.product_id WHERE cart.user_id='$user_id';";
 $cartTotalResult = $mysqli->query($cartTotal);
 $subtotal = 0;
 
-while($rows=$cartTotalResult->fetch_assoc()){
-    $subtotal += $rows['discount']*$rows['quantity'];
+while ($rows = $cartTotalResult->fetch_assoc()) {
+    $subtotal += $rows['discount'] * $rows['quantity'];
 }
 ?>
 <!DOCTYPE html>
@@ -43,7 +64,7 @@ while($rows=$cartTotalResult->fetch_assoc()){
 
     <!-- header section starts -->
     <header class="header">
-    <a class="logo">
+        <a class="logo">
             <img src="images/logo.png">
             Online Grocery Store
         </a>
@@ -61,14 +82,13 @@ while($rows=$cartTotalResult->fetch_assoc()){
             <div id="menu-btn" class="fas fa-bars"></div>
             <div id="search-btn" class="fas fa-search"></div>
             <div id="cart-btn" class="fas fa-shopping-cart"></div>
-        <?php
-            if($_SESSION["user_id"]=="0"){
-                ?><div id="login-btn" class="fas fa-user"></div><?php
-            }
-            else{
-                ?><div onclick="location.href='account.php'" class="fas fa-user"></div><?php
-            }
-        ?>
+            <?php
+                if ($_SESSION["user_id"] == "0") {
+                    ?><div id="login-btn" class="fas fa-user"></div><?php
+                } else {
+                    ?><div onclick="location.href='account.php'" class="fas fa-user"></div><?php
+                }
+            ?>
         </div>
         
         <form action="search.php" class="search-form">
@@ -80,7 +100,7 @@ while($rows=$cartTotalResult->fetch_assoc()){
             <div class="cart-overflow">
                 <!-- DB DISPLAY !!!! -->
                 <?php
-                    while($rows=$cartDisplayResult->fetch_assoc()){
+                    while ($rows = $cartDisplayResult->fetch_assoc()) {
                 ?>
                     <form action="function/cart-change.php" method="POST" class="box">
                         <a onclick="this.closest('form').submit()" class="fas fa-times"></a>
@@ -99,13 +119,12 @@ while($rows=$cartTotalResult->fetch_assoc()){
                 ?>
                 <!-- DB DISPLAY !!!! -->
             </div>
-            <h3 class="total">subtotal : <span>Rs.<?php echo $subtotal;?></span></h3>
+            <h3 class="total">subtotal : <span>Rs.<?php echo $subtotal; ?></span></h3>
             <?php
-                if($user_id !=0){
-                    echo'<a href="cart.php" class="btn">checkout cart</a>';
-                }
-                else{
-                    echo'<a onclick="alert(`You Need To Login First !!`)" class="btn">checkout cart</a>';
+                if ($user_id != 0) {
+                    echo '<a href="cart.php" class="btn">checkout cart</a>';
+                } else {
+                    echo '<a onclick="alert(`You Need To Login First !!`)" class="btn">checkout cart</a>';
                 }
             ?>
         </div>
@@ -148,51 +167,25 @@ while($rows=$cartTotalResult->fetch_assoc()){
     </div>
     <section class="products-all">
         <h1 class="title"> our <span>products</span> <a href="#"></a> </h1>
+        
+        <!-- Sorting Form -->
+        <form action="" method="GET" class="sort-form">
+            <label for="sort">Sort by:</label>
+            <select name="sort" id="sort" onchange="this.form.submit()">
+                <option value="default">Default</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="name_asc">Name: A to Z</option>
+                <option value="name_desc">Name: Z to A</option>
+            </select>
+        </form>
+
         <div class="products-body">
-            <form action="function/filter.php" method="POST" class="filters" id="filter-form">
-                <div class="filter" id="price-filter">
-                    <h3 id="price-btn">price</h3>
-                    <span class="filter-input">
-                        <input type="range" name="range1" min="10" max="200" step="10" id="r1" value="10" oninput="priceFilter()">
-                        <input type="range" name="range2" min="10" max="200" step="10" id="r2" value="200" oninput="priceFilter()">
-                    </span>
-                    
-                </div>
-                <div class="filter" id="cate-filter">
-                    <h3 id="cate-btn">category</h3>
-                    <span class="filter-input">
-                        <input type="checkbox" name="fruits" id="fruits" value="fruits">
-                        <label for="fruits">fruits</label>
-                    </span>
-                    <span class="filter-input">
-                        <input type="checkbox" name="vegetables" id="vegetables" value="vegetables">
-                        <label for="vegetables">vegetables</label>
-                    </span>
-                    <span class="filter-input">
-                        <input type="checkbox" name="dairy" id="dairy" value="dairy">
-                        <label for="dairy">dairy & eggs</label>
-                    </span>
-                    <span class="filter-input">
-                        <input type="checkbox" name="spices" id="spices" value="spices">
-                        <label for="spices">organic spices</label>
-                    </span>
-                    <span class="filter-input">
-                        <input type="checkbox" name="grains" id="grains" value="grains">
-                        <label for="grains">grains</label>
-                    </span>
-                    <span class="filter-input">
-                        <input type="checkbox" name="bakery" id="bakery" value="bakery">
-                        <label for="bakery">bakery</label>
-                    </span>
-                </div>
-                <input type="submit" value="apply filters" class="btn" id="filter-submit">
-            </form>
             <div class="box-container">
                 <!-- DB DISPLAY !!!! -->
                 <?php
-                    while($rows=$productDisplayResult->fetch_assoc()){
+                    while ($rows = $productDisplayResult->fetch_assoc()) {
                 ?>
-
                 <form action="function/cart-change.php" method="POST" class="box">
                     <div class="image">
                         <img src="products/<?php echo $rows['product_image']; ?>" alt="">
@@ -202,29 +195,27 @@ while($rows=$cartTotalResult->fetch_assoc()){
                         <div class="price">Rs.<?php echo $rows['discount']; ?><span class="discount">Rs.<?php echo $rows['price']; ?></span></div>
                         <div class="cart-add">
                             <input type="hidden" name="product" value="<?php echo $rows['product_id']; ?>">
-                    <?php
-                        $product = $rows['product_id'];
-                        $user_id = $_SESSION['user_id'];
-                        $check = "SELECT * FROM `cart` WHERE `user_id`='$user_id' AND `product_id`='$product'";
-                        $checkResult = $mysqli->query($check);
-                        if(mysqli_num_rows($checkResult)==0){
-                    ?>
-                        <input type="hidden" name="op" value="add">
-                        <input type="submit" class="btn" value="add to cart">
-                    <?php
-                        }
-                        else{
-                    ?>
-                        <input type="hidden" name="op" value="remove">
-                        <input type="submit" class="btn" value="remove">
-                    <?php
-                        }
-                    ?>
+                            <?php
+                                $product = $rows['product_id'];
+                                $user_id = $_SESSION['user_id'];
+                                $check = "SELECT * FROM `cart` WHERE `user_id`='$user_id' AND `product_id`='$product'";
+                                $checkResult = $mysqli->query($check);
+                                if (mysqli_num_rows($checkResult) == 0) {
+                            ?>
+                                <input type="hidden" name="op" value="add">
+                                <input type="submit" class="btn" value="add to cart">
+                            <?php
+                                } else {
+                            ?>
+                                <input type="hidden" name="op" value="remove">
+                                <input type="submit" class="btn" value="remove">
+                            <?php
+                                }
+                            ?>
                             <a href="" class="far fa-star cart-save"></a>
                         </div>
                     </div>
                 </form>
-
                 <?php
                     }
                 ?>
@@ -232,8 +223,7 @@ while($rows=$cartTotalResult->fetch_assoc()){
             </div>
         </div>
     </section>
-    <!-- shop section ends -->
-
+    
     <!-- footer section starts -->
     <footer class="footer">
         <div class="box-container">
@@ -275,26 +265,7 @@ while($rows=$cartTotalResult->fetch_assoc()){
             </div>
         </div>
     </footer>
-    <div class="border"></div>
     <!-- footer section ends -->
-    <?php
-    if($_SESSION['cart']=='on'){
-        echo "<script>document.querySelector('.shopping-cart').classList.add('cart-active');</script>";
-        $_SESSION['cart']='off';
-    }
-    
-    if($_SESSION['login']=='on'){
-        echo "<script>document.querySelector('.login-form').classList.add('login-active');</script>";
-        echo "<script>setTimeout(() => {alert('Username Or Password Incorrect');}, 500);</script>";
-        $_SESSION['login']='off';
-    }
-    
-    if($_SESSION['register']=='on'){
-        echo "<script>document.querySelector('.register-form').classList.add('login-active');</script>";
-        echo "<script>setTimeout(() => {alert('Username Already Taken');}, 500);</script>";
-        $_SESSION['register']='off';
-    }
-    ?>
-    <script src="lib/script.js"></script>
+
 </body>
 </html>
