@@ -1,0 +1,955 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- phpMyAdmin XML Dump
+- version 5.2.0
+- https://www.phpmyadmin.net
+-
+- Host: 127.0.0.1
+- Generation Time: Sep 24, 2023 at 06:50 AM
+- Server version: 10.4.27-MariaDB
+- PHP Version: 8.2.0
+-->
+
+<pma_xml_export version="1.0" xmlns:pma="https://www.phpmyadmin.net/some_doc_url/">
+    <!--
+    - Structure schemas
+    -->
+    <pma:structure_schemas>
+        <pma:database name="garden_roots" collation="utf8mb4_general_ci" charset="utf8mb4">
+            <pma:table name="admins">
+                CREATE TABLE `admins` (
+                  `admin_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `username` varchar(30) NOT NULL,
+                  `password` varchar(30) NOT NULL,
+                  `email` varchar(50) NOT NULL,
+                  UNIQUE KEY `admin_id` (`admin_id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            </pma:table>
+            <pma:table name="blog">
+                CREATE TABLE `blog` (
+                  `blog_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `admin_id` int(11) NOT NULL,
+                  `blog_title` varchar(30) NOT NULL,
+                  `blog_data` varchar(200) NOT NULL,
+                  `blog_image` varchar(30) NOT NULL,
+                  `date` date NOT NULL DEFAULT current_timestamp(),
+                  UNIQUE KEY `blog_id` (`blog_id`),
+                  UNIQUE KEY `blog_title` (`blog_title`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            </pma:table>
+            <pma:table name="cart">
+                CREATE TABLE `cart` (
+                  `cart_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `product_id` int(11) NOT NULL,
+                  `user_id` int(11) NOT NULL,
+                  `quantity` int(11) NOT NULL,
+                  UNIQUE KEY `cart_id` (`cart_id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=258 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            </pma:table>
+            <pma:table name="gallery">
+                CREATE TABLE `gallery` (
+                  `gallery_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `admin_id` int(11) NOT NULL,
+                  `gallery_image` varchar(30) NOT NULL,
+                  `date` date NOT NULL DEFAULT current_timestamp(),
+                  UNIQUE KEY `gallery_id` (`gallery_id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            </pma:table>
+            <pma:table name="order">
+                CREATE TABLE `order` (
+                  `order_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `order_set` varchar(10) NOT NULL,
+                  `product_id` int(11) NOT NULL,
+                  `user_id` int(11) NOT NULL,
+                  `quantity` int(11) NOT NULL,
+                  `total` int(11) NOT NULL,
+                  `date` date NOT NULL,
+                  `status` varchar(20) NOT NULL DEFAULT &#039;pending&#039;,
+                  `payment_method` varchar(20) NOT NULL,
+                  `address` varchar(300) NOT NULL,
+                  `time` datetime NOT NULL DEFAULT current_timestamp(),
+                  UNIQUE KEY `order_id` (`order_id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=154 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            </pma:table>
+            <pma:table name="product">
+                CREATE TABLE `product` (
+                  `product_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `product` varchar(20) NOT NULL,
+                  `price` int(11) NOT NULL,
+                  `discount` int(11) NOT NULL,
+                  `product_image` varchar(30) NOT NULL,
+                  `description` varchar(200) NOT NULL,
+                  `category` varchar(20) NOT NULL,
+                  `sales` bigint(20) NOT NULL DEFAULT 0,
+                  `ordered` bigint(20) NOT NULL DEFAULT 0,
+                  `featured` tinyint(1) NOT NULL DEFAULT 0,
+                  UNIQUE KEY `product_id` (`product_id`),
+                  UNIQUE KEY `product` (`product`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            </pma:table>
+            <pma:table name="review">
+                CREATE TABLE `review` (
+                  `review_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `user_id` int(11) NOT NULL,
+                  `rating` int(11) NOT NULL DEFAULT 5,
+                  `review` varchar(225) NOT NULL,
+                  UNIQUE KEY `review_id` (`review_id`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            </pma:table>
+            <pma:table name="users">
+                CREATE TABLE `users` (
+                  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `username` varchar(30) NOT NULL,
+                  `password` varchar(30) NOT NULL,
+                  `email` varchar(50) NOT NULL,
+                  `phone` varchar(10) NOT NULL,
+                  `profile_pic` varchar(30) NOT NULL DEFAULT &#039;default.png&#039;,
+                  `add1` varchar(100) DEFAULT NULL,
+                  `add2` varchar(100) DEFAULT NULL,
+                  `add3` varchar(100) DEFAULT NULL,
+                  `credits` bigint(20) NOT NULL DEFAULT 0,
+                  UNIQUE KEY `user_id` (`user_id`),
+                  UNIQUE KEY `username` (`username`),
+                  UNIQUE KEY `phone` (`phone`),
+                  UNIQUE KEY `email` (`email`)
+                ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+            </pma:table>
+        </pma:database>
+    </pma:structure_schemas>
+
+    <!--
+    - Database: 'garden_roots'
+    -->
+    <database name="garden_roots">
+        <!-- Table admins -->
+        <table name="admins">
+            <column name="admin_id">1</column>
+            <column name="username">rushilprasad</column>
+            <column name="password">password</column>
+            <column name="email">rushil321@gmail.com</column>
+        </table>
+        <!-- Table blog -->
+        <table name="blog">
+            <column name="blog_id">1</column>
+            <column name="admin_id">1</column>
+            <column name="blog_title">Fresh Journey</column>
+            <column name="blog_data">Ever wondered how fresh produce reaches your local grocery store shelves? Explore the fascinating process...</column>
+            <column name="blog_image">blog1.jpg</column>
+            <column name="date">2023-08-15</column>
+        </table>
+        <table name="blog">
+            <column name="blog_id">2</column>
+            <column name="admin_id">1</column>
+            <column name="blog_title">Online Convenien</column>
+            <column name="blog_data">Experience the ease and convenience of online grocery shopping today. Shop smart and save time...</column>
+            <column name="blog_image">blog2.jpg</column>
+            <column name="date">2023-08-15</column>
+        </table>
+        <table name="blog">
+            <column name="blog_id">3</column>
+            <column name="admin_id">1</column>
+            <column name="blog_title">Kitchen Essentials</column>
+            <column name="blog_data">Upgrade your cooking game with these essential kitchen gadgets for better meals and happier cooking...</column>
+            <column name="blog_image">blog3.jpg</column>
+            <column name="date">2023-08-15</column>
+        </table>
+        <table name="blog">
+            <column name="blog_id">4</column>
+            <column name="admin_id">1</column>
+            <column name="blog_title">Sustainable Choices</column>
+            <column name="blog_data">Make eco-friendly choices and reduce your environmental impact with sustainable shopping habits...</column>
+            <column name="blog_image">blog4.jpg</column>
+            <column name="date">2023-08-15</column>
+        </table>
+        <table name="blog">
+            <column name="blog_id">5</column>
+            <column name="admin_id">1</column>
+            <column name="blog_title">Quick Dinners</column>
+            <column name="blog_data">Discover easy and nutritious weeknight dinner ideas using pantry staples. Dinner solved deliciously...</column>
+            <column name="blog_image">blog5.jpg</column>
+            <column name="date">2023-08-15</column>
+        </table>
+        <!-- Table cart -->
+        <table name="cart">
+            <column name="cart_id">254</column>
+            <column name="product_id">10</column>
+            <column name="user_id">10</column>
+            <column name="quantity">1</column>
+        </table>
+        <table name="cart">
+            <column name="cart_id">255</column>
+            <column name="product_id">9</column>
+            <column name="user_id">10</column>
+            <column name="quantity">1</column>
+        </table>
+        <table name="cart">
+            <column name="cart_id">257</column>
+            <column name="product_id">5</column>
+            <column name="user_id">10</column>
+            <column name="quantity">1</column>
+        </table>
+        <!-- Table gallery -->
+        <table name="gallery">
+            <column name="gallery_id">1</column>
+            <column name="admin_id">1</column>
+            <column name="gallery_image">gallery1.jpg</column>
+            <column name="date">2023-08-15</column>
+        </table>
+        <table name="gallery">
+            <column name="gallery_id">2</column>
+            <column name="admin_id">1</column>
+            <column name="gallery_image">gallery2.jpg</column>
+            <column name="date">2023-08-15</column>
+        </table>
+        <table name="gallery">
+            <column name="gallery_id">3</column>
+            <column name="admin_id">1</column>
+            <column name="gallery_image">gallery3.jpg</column>
+            <column name="date">2023-08-15</column>
+        </table>
+        <table name="gallery">
+            <column name="gallery_id">4</column>
+            <column name="admin_id">1</column>
+            <column name="gallery_image">gallery4.jpg</column>
+            <column name="date">2023-08-15</column>
+        </table>
+        <table name="gallery">
+            <column name="gallery_id">5</column>
+            <column name="admin_id">1</column>
+            <column name="gallery_image">gallery1.jpg</column>
+            <column name="date">2023-08-15</column>
+        </table>
+        <table name="gallery">
+            <column name="gallery_id">6</column>
+            <column name="admin_id">1</column>
+            <column name="gallery_image">gallery2.jpg</column>
+            <column name="date">2023-08-15</column>
+        </table>
+        <!-- Table order -->
+        <table name="order">
+            <column name="order_id">118</column>
+            <column name="order_set">YQN</column>
+            <column name="product_id">6</column>
+            <column name="user_id">1</column>
+            <column name="quantity">3</column>
+            <column name="total">598</column>
+            <column name="date">2023-07-12</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">156, Sayda Marg, Narayan Street, Opp Ramesh park, Manjalpur -390012</column>
+            <column name="time">2023-09-12 09:23:34</column>
+        </table>
+        <table name="order">
+            <column name="order_id">119</column>
+            <column name="order_set">YQN</column>
+            <column name="product_id">9</column>
+            <column name="user_id">1</column>
+            <column name="quantity">5</column>
+            <column name="total">598</column>
+            <column name="date">2023-07-12</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">156, Sayda Marg, Narayan Street, Opp Ramesh park, Manjalpur -390012</column>
+            <column name="time">2023-09-12 09:23:34</column>
+        </table>
+        <table name="order">
+            <column name="order_id">120</column>
+            <column name="order_set">YQN</column>
+            <column name="product_id">10</column>
+            <column name="user_id">1</column>
+            <column name="quantity">2</column>
+            <column name="total">598</column>
+            <column name="date">2023-07-12</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">156, Sayda Marg, Narayan Street, Opp Ramesh park, Manjalpur -390012</column>
+            <column name="time">2023-09-12 09:23:34</column>
+        </table>
+        <table name="order">
+            <column name="order_id">121</column>
+            <column name="order_set">YQN</column>
+            <column name="product_id">14</column>
+            <column name="user_id">1</column>
+            <column name="quantity">2</column>
+            <column name="total">598</column>
+            <column name="date">2023-07-12</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">156, Sayda Marg, Narayan Street, Opp Ramesh park, Manjalpur -390012</column>
+            <column name="time">2023-09-12 09:23:34</column>
+        </table>
+        <table name="order">
+            <column name="order_id">122</column>
+            <column name="order_set">YQN</column>
+            <column name="product_id">12</column>
+            <column name="user_id">1</column>
+            <column name="quantity">4</column>
+            <column name="total">598</column>
+            <column name="date">2023-07-12</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">156, Sayda Marg, Narayan Street, Opp Ramesh park, Manjalpur -390012</column>
+            <column name="time">2023-09-12 09:23:34</column>
+        </table>
+        <table name="order">
+            <column name="order_id">123</column>
+            <column name="order_set">YQN</column>
+            <column name="product_id">19</column>
+            <column name="user_id">1</column>
+            <column name="quantity">2</column>
+            <column name="total">598</column>
+            <column name="date">2023-07-12</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">156, Sayda Marg, Narayan Street, Opp Ramesh park, Manjalpur -390012</column>
+            <column name="time">2023-09-12 09:23:34</column>
+        </table>
+        <table name="order">
+            <column name="order_id">125</column>
+            <column name="order_set">AK0</column>
+            <column name="product_id">5</column>
+            <column name="user_id">2</column>
+            <column name="quantity">2</column>
+            <column name="total">593</column>
+            <column name="date">2023-07-22</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">502, Nirma Residence, Near Basant Road, Karelibaugh -390015</column>
+            <column name="time">2023-09-12 09:24:41</column>
+        </table>
+        <table name="order">
+            <column name="order_id">126</column>
+            <column name="order_set">AK0</column>
+            <column name="product_id">7</column>
+            <column name="user_id">2</column>
+            <column name="quantity">3</column>
+            <column name="total">593</column>
+            <column name="date">2023-07-22</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">502, Nirma Residence, Near Basant Road, Karelibaugh -390015</column>
+            <column name="time">2023-09-12 09:24:41</column>
+        </table>
+        <table name="order">
+            <column name="order_id">127</column>
+            <column name="order_set">AK0</column>
+            <column name="product_id">8</column>
+            <column name="user_id">2</column>
+            <column name="quantity">3</column>
+            <column name="total">593</column>
+            <column name="date">2023-07-22</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">502, Nirma Residence, Near Basant Road, Karelibaugh -390015</column>
+            <column name="time">2023-09-12 09:24:41</column>
+        </table>
+        <table name="order">
+            <column name="order_id">128</column>
+            <column name="order_set">AK0</column>
+            <column name="product_id">11</column>
+            <column name="user_id">2</column>
+            <column name="quantity">5</column>
+            <column name="total">593</column>
+            <column name="date">2023-07-22</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">502, Nirma Residence, Near Basant Road, Karelibaugh -390015</column>
+            <column name="time">2023-09-12 09:24:41</column>
+        </table>
+        <table name="order">
+            <column name="order_id">129</column>
+            <column name="order_set">AK0</column>
+            <column name="product_id">18</column>
+            <column name="user_id">2</column>
+            <column name="quantity">2</column>
+            <column name="total">593</column>
+            <column name="date">2023-07-22</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">502, Nirma Residence, Near Basant Road, Karelibaugh -390015</column>
+            <column name="time">2023-09-12 09:24:41</column>
+        </table>
+        <table name="order">
+            <column name="order_id">130</column>
+            <column name="order_set">AK0</column>
+            <column name="product_id">13</column>
+            <column name="user_id">2</column>
+            <column name="quantity">1</column>
+            <column name="total">593</column>
+            <column name="date">2023-07-22</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">502, Nirma Residence, Near Basant Road, Karelibaugh -390015</column>
+            <column name="time">2023-09-12 09:24:41</column>
+        </table>
+        <table name="order">
+            <column name="order_id">132</column>
+            <column name="order_set">ZF1</column>
+            <column name="product_id">1</column>
+            <column name="user_id">5</column>
+            <column name="quantity">3</column>
+            <column name="total">608</column>
+            <column name="date">2023-07-30</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">22-B, Mahesh Gandhi Duplex,opp Janata Garage, Maneja -380011 </column>
+            <column name="time">2023-09-12 09:25:52</column>
+        </table>
+        <table name="order">
+            <column name="order_id">133</column>
+            <column name="order_set">ZF1</column>
+            <column name="product_id">15</column>
+            <column name="user_id">5</column>
+            <column name="quantity">2</column>
+            <column name="total">608</column>
+            <column name="date">2023-07-30</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">22-B, Mahesh Gandhi Duplex,opp Janata Garage, Maneja -380011 </column>
+            <column name="time">2023-09-12 09:25:52</column>
+        </table>
+        <table name="order">
+            <column name="order_id">134</column>
+            <column name="order_set">ZF1</column>
+            <column name="product_id">21</column>
+            <column name="user_id">5</column>
+            <column name="quantity">2</column>
+            <column name="total">608</column>
+            <column name="date">2023-07-30</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">22-B, Mahesh Gandhi Duplex,opp Janata Garage, Maneja -380011 </column>
+            <column name="time">2023-09-12 09:25:52</column>
+        </table>
+        <table name="order">
+            <column name="order_id">135</column>
+            <column name="order_set">ZF1</column>
+            <column name="product_id">2</column>
+            <column name="user_id">5</column>
+            <column name="quantity">2</column>
+            <column name="total">608</column>
+            <column name="date">2023-07-30</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">22-B, Mahesh Gandhi Duplex,opp Janata Garage, Maneja -380011 </column>
+            <column name="time">2023-09-12 09:25:52</column>
+        </table>
+        <table name="order">
+            <column name="order_id">136</column>
+            <column name="order_set">ZF1</column>
+            <column name="product_id">3</column>
+            <column name="user_id">5</column>
+            <column name="quantity">2</column>
+            <column name="total">608</column>
+            <column name="date">2023-07-30</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">22-B, Mahesh Gandhi Duplex,opp Janata Garage, Maneja -380011 </column>
+            <column name="time">2023-09-12 09:25:52</column>
+        </table>
+        <table name="order">
+            <column name="order_id">137</column>
+            <column name="order_set">ZF1</column>
+            <column name="product_id">4</column>
+            <column name="user_id">5</column>
+            <column name="quantity">4</column>
+            <column name="total">608</column>
+            <column name="date">2023-07-30</column>
+            <column name="status">delivered</column>
+            <column name="payment_method">credit card</column>
+            <column name="address">22-B, Mahesh Gandhi Duplex,opp Janata Garage, Maneja -380011 </column>
+            <column name="time">2023-09-12 09:25:52</column>
+        </table>
+        <table name="order">
+            <column name="order_id">139</column>
+            <column name="order_set">8BI</column>
+            <column name="product_id">13</column>
+            <column name="user_id">6</column>
+            <column name="quantity">1</column>
+            <column name="total">443</column>
+            <column name="date">2023-08-10</column>
+            <column name="status">on delivery</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">5-B, Rajesh Duplex, Near Sangham Char Rasta, Harni - 390211</column>
+            <column name="time">2023-09-12 09:27:39</column>
+        </table>
+        <table name="order">
+            <column name="order_id">140</column>
+            <column name="order_set">8BI</column>
+            <column name="product_id">14</column>
+            <column name="user_id">6</column>
+            <column name="quantity">2</column>
+            <column name="total">443</column>
+            <column name="date">2023-08-10</column>
+            <column name="status">on delivery</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">5-B, Rajesh Duplex, Near Sangham Char Rasta, Harni - 390211</column>
+            <column name="time">2023-09-12 09:27:39</column>
+        </table>
+        <table name="order">
+            <column name="order_id">141</column>
+            <column name="order_set">8BI</column>
+            <column name="product_id">12</column>
+            <column name="user_id">6</column>
+            <column name="quantity">2</column>
+            <column name="total">443</column>
+            <column name="date">2023-08-10</column>
+            <column name="status">on delivery</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">5-B, Rajesh Duplex, Near Sangham Char Rasta, Harni - 390211</column>
+            <column name="time">2023-09-12 09:27:39</column>
+        </table>
+        <table name="order">
+            <column name="order_id">142</column>
+            <column name="order_set">8BI</column>
+            <column name="product_id">20</column>
+            <column name="user_id">6</column>
+            <column name="quantity">4</column>
+            <column name="total">443</column>
+            <column name="date">2023-08-10</column>
+            <column name="status">on delivery</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">5-B, Rajesh Duplex, Near Sangham Char Rasta, Harni - 390211</column>
+            <column name="time">2023-09-12 09:27:39</column>
+        </table>
+        <table name="order">
+            <column name="order_id">143</column>
+            <column name="order_set">8BI</column>
+            <column name="product_id">19</column>
+            <column name="user_id">6</column>
+            <column name="quantity">2</column>
+            <column name="total">443</column>
+            <column name="date">2023-08-10</column>
+            <column name="status">on delivery</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">5-B, Rajesh Duplex, Near Sangham Char Rasta, Harni - 390211</column>
+            <column name="time">2023-09-12 09:27:39</column>
+        </table>
+        <table name="order">
+            <column name="order_id">144</column>
+            <column name="order_set">8BI</column>
+            <column name="product_id">18</column>
+            <column name="user_id">6</column>
+            <column name="quantity">2</column>
+            <column name="total">443</column>
+            <column name="date">2023-08-10</column>
+            <column name="status">on delivery</column>
+            <column name="payment_method">pay balance</column>
+            <column name="address">5-B, Rajesh Duplex, Near Sangham Char Rasta, Harni - 390211</column>
+            <column name="time">2023-09-12 09:27:39</column>
+        </table>
+        <table name="order">
+            <column name="order_id">150</column>
+            <column name="order_set">DON</column>
+            <column name="product_id">14</column>
+            <column name="user_id">10</column>
+            <column name="quantity">1</column>
+            <column name="total">51</column>
+            <column name="date">2023-09-18</column>
+            <column name="status">pending</column>
+            <column name="payment_method">cash on delivery</column>
+            <column name="address">21 Shivam Park Society, near NEO summer school, Tarsali, Vadodara - 392100 </column>
+            <column name="time">2023-09-18 16:07:33</column>
+        </table>
+        <table name="order">
+            <column name="order_id">151</column>
+            <column name="order_set">DON</column>
+            <column name="product_id">12</column>
+            <column name="user_id">10</column>
+            <column name="quantity">1</column>
+            <column name="total">51</column>
+            <column name="date">2023-09-18</column>
+            <column name="status">pending</column>
+            <column name="payment_method">cash on delivery</column>
+            <column name="address">21 Shivam Park Society, near NEO summer school, Tarsali, Vadodara - 392100 </column>
+            <column name="time">2023-09-18 16:07:33</column>
+        </table>
+        <!-- Table product -->
+        <table name="product">
+            <column name="product_id">1</column>
+            <column name="product">apple -4pc</column>
+            <column name="price">69</column>
+            <column name="discount">52</column>
+            <column name="product_image">apple.png</column>
+            <column name="description">0</column>
+            <column name="category">fruits</column>
+            <column name="sales">3</column>
+            <column name="ordered">1</column>
+            <column name="featured">1</column>
+        </table>
+        <table name="product">
+            <column name="product_id">2</column>
+            <column name="product">avocado -4pc</column>
+            <column name="price">59</column>
+            <column name="discount">49</column>
+            <column name="product_image">avocado.png</column>
+            <column name="description">0</column>
+            <column name="category">fruits</column>
+            <column name="sales">2</column>
+            <column name="ordered">1</column>
+            <column name="featured">0</column>
+        </table>
+        <table name="product">
+            <column name="product_id">3</column>
+            <column name="product">banana -4pc</column>
+            <column name="price">24</column>
+            <column name="discount">19</column>
+            <column name="product_image">banana.png</column>
+            <column name="description">0</column>
+            <column name="category">fruits</column>
+            <column name="sales">2</column>
+            <column name="ordered">1</column>
+            <column name="featured">0</column>
+        </table>
+        <table name="product">
+            <column name="product_id">4</column>
+            <column name="product">blueberry -200g</column>
+            <column name="price">39</column>
+            <column name="discount">24</column>
+            <column name="product_image">blueberry.png</column>
+            <column name="description">0</column>
+            <column name="category">fruits</column>
+            <column name="sales">4</column>
+            <column name="ordered">1</column>
+            <column name="featured">0</column>
+        </table>
+        <table name="product">
+            <column name="product_id">5</column>
+            <column name="product">bread -100g</column>
+            <column name="price">24</column>
+            <column name="discount">19</column>
+            <column name="product_image">bread.png</column>
+            <column name="description">0</column>
+            <column name="category">bakery</column>
+            <column name="sales">2</column>
+            <column name="ordered">1</column>
+            <column name="featured">1</column>
+        </table>
+        <table name="product">
+            <column name="product_id">6</column>
+            <column name="product">broccoli -200g</column>
+            <column name="price">49</column>
+            <column name="discount">36</column>
+            <column name="product_image">broccoli.png</column>
+            <column name="description">0</column>
+            <column name="category">vegetables</column>
+            <column name="sales">3</column>
+            <column name="ordered">1</column>
+            <column name="featured">0</column>
+        </table>
+        <table name="product">
+            <column name="product_id">7</column>
+            <column name="product">buns -100g</column>
+            <column name="price">29</column>
+            <column name="discount">24</column>
+            <column name="product_image">buns.png</column>
+            <column name="description">0</column>
+            <column name="category">bakery</column>
+            <column name="sales">3</column>
+            <column name="ordered">1</column>
+            <column name="featured">0</column>
+        </table>
+        <table name="product">
+            <column name="product_id">8</column>
+            <column name="product">butter -100g</column>
+            <column name="price">59</column>
+            <column name="discount">44</column>
+            <column name="product_image">butter.png</column>
+            <column name="description">0</column>
+            <column name="category">dairy</column>
+            <column name="sales">3</column>
+            <column name="ordered">1</column>
+            <column name="featured">1</column>
+        </table>
+        <table name="product">
+            <column name="product_id">9</column>
+            <column name="product">carrot -200g</column>
+            <column name="price">36</column>
+            <column name="discount">24</column>
+            <column name="product_image">carrot.png</column>
+            <column name="description">0</column>
+            <column name="category">vegetables</column>
+            <column name="sales">5</column>
+            <column name="ordered">1</column>
+            <column name="featured">1</column>
+        </table>
+        <table name="product">
+            <column name="product_id">10</column>
+            <column name="product">cauliflower -200g</column>
+            <column name="price">54</column>
+            <column name="discount">36</column>
+            <column name="product_image">cauliflower.png</column>
+            <column name="description">0</column>
+            <column name="category">vegetables</column>
+            <column name="sales">2</column>
+            <column name="ordered">1</column>
+            <column name="featured">1</column>
+        </table>
+        <table name="product">
+            <column name="product_id">11</column>
+            <column name="product">cheese -100g</column>
+            <column name="price">59</column>
+            <column name="discount">34</column>
+            <column name="product_image">cheese.png</column>
+            <column name="description">0</column>
+            <column name="category">dairy</column>
+            <column name="sales">5</column>
+            <column name="ordered">1</column>
+            <column name="featured">1</column>
+        </table>
+        <table name="product">
+            <column name="product_id">12</column>
+            <column name="product">cucumber -5pc</column>
+            <column name="price">29</column>
+            <column name="discount">24</column>
+            <column name="product_image">cucumber.png</column>
+            <column name="description">0</column>
+            <column name="category">vegetables</column>
+            <column name="sales">7</column>
+            <column name="ordered">3</column>
+            <column name="featured">1</column>
+        </table>
+        <table name="product">
+            <column name="product_id">13</column>
+            <column name="product">eggs -12pc</column>
+            <column name="price">79</column>
+            <column name="discount">69</column>
+            <column name="product_image">eggs.png</column>
+            <column name="description">0</column>
+            <column name="category">dairy</column>
+            <column name="sales">2</column>
+            <column name="ordered">2</column>
+            <column name="featured">0</column>
+        </table>
+        <table name="product">
+            <column name="product_id">14</column>
+            <column name="product">garlic -100g</column>
+            <column name="price">24</column>
+            <column name="discount">19</column>
+            <column name="product_image">garlic.png</column>
+            <column name="description">0</column>
+            <column name="category">vegetables</column>
+            <column name="sales">5</column>
+            <column name="ordered">3</column>
+            <column name="featured">1</column>
+        </table>
+        <table name="product">
+            <column name="product_id">15</column>
+            <column name="product">grape -200g</column>
+            <column name="price">49</column>
+            <column name="discount">36</column>
+            <column name="product_image">grape.png</column>
+            <column name="description">0</column>
+            <column name="category">fruits</column>
+            <column name="sales">2</column>
+            <column name="ordered">1</column>
+            <column name="featured">0</column>
+        </table>
+        <table name="product">
+            <column name="product_id">16</column>
+            <column name="product">guava -4pc</column>
+            <column name="price">49</column>
+            <column name="discount">36</column>
+            <column name="product_image">guava.png</column>
+            <column name="description">0</column>
+            <column name="category">fruits</column>
+            <column name="sales">0</column>
+            <column name="ordered">0</column>
+            <column name="featured">0</column>
+        </table>
+        <table name="product">
+            <column name="product_id">17</column>
+            <column name="product">kiwi -4pc</column>
+            <column name="price">54</column>
+            <column name="discount">42</column>
+            <column name="product_image">kiwi.png</column>
+            <column name="description">0</column>
+            <column name="category">fruits</column>
+            <column name="sales">0</column>
+            <column name="ordered">0</column>
+            <column name="featured">0</column>
+        </table>
+        <table name="product">
+            <column name="product_id">18</column>
+            <column name="product">milk -1l</column>
+            <column name="price">35</column>
+            <column name="discount">24</column>
+            <column name="product_image">milk.png</column>
+            <column name="description">0</column>
+            <column name="category">dairy</column>
+            <column name="sales">4</column>
+            <column name="ordered">2</column>
+            <column name="featured">1</column>
+        </table>
+        <table name="product">
+            <column name="product_id">19</column>
+            <column name="product">olive -200g</column>
+            <column name="price">54</column>
+            <column name="discount">46</column>
+            <column name="product_image">olive.png</column>
+            <column name="description">0</column>
+            <column name="category">fruits</column>
+            <column name="sales">4</column>
+            <column name="ordered">2</column>
+            <column name="featured">0</column>
+        </table>
+        <table name="product">
+            <column name="product_id">20</column>
+            <column name="product">onion -200g</column>
+            <column name="price">35</column>
+            <column name="discount">24</column>
+            <column name="product_image">onion.png</column>
+            <column name="description">0</column>
+            <column name="category">vegetables</column>
+            <column name="sales">4</column>
+            <column name="ordered">1</column>
+            <column name="featured">1</column>
+        </table>
+        <table name="product">
+            <column name="product_id">21</column>
+            <column name="product">orange -4pc</column>
+            <column name="price">49</column>
+            <column name="discount">44</column>
+            <column name="product_image">orange.png</column>
+            <column name="description">0</column>
+            <column name="category">fruits</column>
+            <column name="sales">2</column>
+            <column name="ordered">1</column>
+            <column name="featured">0</column>
+        </table>
+        <table name="product">
+            <column name="product_id">22</column>
+            <column name="product">paneer -100g</column>
+            <column name="price">44</column>
+            <column name="discount">34</column>
+            <column name="product_image">paneer.png</column>
+            <column name="description">0</column>
+            <column name="category">dairy</column>
+            <column name="sales">0</column>
+            <column name="ordered">0</column>
+            <column name="featured">0</column>
+        </table>
+        <!-- Table review -->
+        <table name="review">
+            <column name="review_id">1</column>
+            <column name="user_id">1</column>
+            <column name="rating">4</column>
+            <column name="review">A fantastic online grocery shopping experience! The website&#039;s layout is intuitive, making it a breeze to find everything I need. The prices are competitive, and the timely delivery is a big plus. Highly recommended!</column>
+        </table>
+        <table name="review">
+            <column name="review_id">2</column>
+            <column name="user_id">2</column>
+            <column name="rating">5</column>
+            <column name="review">Absolutely love this grocery website! It&#039;s incredibly convenient and user-friendly. The wide selection of fresh produce and pantry staples keeps me coming back for more. Fast delivery and excellent customer service too!</column>
+        </table>
+        <table name="review">
+            <column name="review_id">3</column>
+            <column name="user_id">3</column>
+            <column name="rating">4</column>
+            <column name="review">This grocery website has revolutionized my shopping routine. With its seamless navigation and diverse product range, I can easily stock up on essentials. The responsive customer support team adds an extra layer of trust!</column>
+        </table>
+        <table name="review">
+            <column name="review_id">4</column>
+            <column name="user_id">4</column>
+            <column name="rating">5</column>
+            <column name="review">Impressive variety and quality on this grocery website. From organic goodies to international delights, they&#039;ve got it all. Ordering is effortless, and their on-time delivery never disappoints. Top-notch service!</column>
+        </table>
+        <table name="review">
+            <column name="review_id">5</column>
+            <column name="user_id">5</column>
+            <column name="rating">5</column>
+            <column name="review">I can&#039;t stop praising this grocery website! The search feature is efficient, allowing me to quickly locate my favorite items. The packaging is sturdy, ensuring my groceries arrive in perfect condition. A must-try for all shop</column>
+        </table>
+        <table name="review">
+            <column name="review_id">6</column>
+            <column name="user_id">6</column>
+            <column name="rating">3</column>
+            <column name="review">Kudos to this grocery website for making my life easier! With their vast assortment of specialty items, I can explore new flavors. The smooth checkout process and reliable delivery make shopping delightful. 5-star experience!</column>
+        </table>
+        <!-- Table users -->
+        <table name="users">
+            <column name="user_id">1</column>
+            <column name="username">EmmaJohnson</column>
+            <column name="password">password</column>
+            <column name="email">emmajohnson@gmail.com</column>
+            <column name="phone">9821456472</column>
+            <column name="profile_pic">user1.jpeg</column>
+            <column name="add1">156, Sayda Marg, Narayan Street, Opp Ramesh park, Manjalpur -390012</column>
+            <column name="add2">NULL</column>
+            <column name="add3">NULL</column>
+            <column name="credits">0</column>
+        </table>
+        <table name="users">
+            <column name="user_id">2</column>
+            <column name="username">LiamAnderson</column>
+            <column name="password">password</column>
+            <column name="email">liamanderson@gmail.com</column>
+            <column name="phone">9853157562</column>
+            <column name="profile_pic">user2.jpeg</column>
+            <column name="add1">502, Nirma Residence, Near Basant Road, Karelibaugh -390015</column>
+            <column name="add2">NULL</column>
+            <column name="add3">NULL</column>
+            <column name="credits">0</column>
+        </table>
+        <table name="users">
+            <column name="user_id">3</column>
+            <column name="username">NoahSmith</column>
+            <column name="password">password</column>
+            <column name="email">noahsmith@gmail.com</column>
+            <column name="phone">9124812756</column>
+            <column name="profile_pic">user3.jpeg</column>
+            <column name="add1">NULL</column>
+            <column name="add2">NULL</column>
+            <column name="add3">NULL</column>
+            <column name="credits">0</column>
+        </table>
+        <table name="users">
+            <column name="user_id">4</column>
+            <column name="username">SophiaWilliams</column>
+            <column name="password">password</column>
+            <column name="email">sophiawilliams@gmail.com</column>
+            <column name="phone">9124578432</column>
+            <column name="profile_pic">user4.jpg</column>
+            <column name="add1">NULL</column>
+            <column name="add2">NULL</column>
+            <column name="add3">NULL</column>
+            <column name="credits">0</column>
+        </table>
+        <table name="users">
+            <column name="user_id">5</column>
+            <column name="username">EthanMartinez</column>
+            <column name="password">password</column>
+            <column name="email">ethanmartinez@gmail.com</column>
+            <column name="phone">9454879452</column>
+            <column name="profile_pic">user5.jpeg</column>
+            <column name="add1">22-B, Mahesh Gandhi Duplex,opp Janata Garage, Maneja -380011 </column>
+            <column name="add2">NULL</column>
+            <column name="add3">NULL</column>
+            <column name="credits">0</column>
+        </table>
+        <table name="users">
+            <column name="user_id">6</column>
+            <column name="username">BenjaminTaylor</column>
+            <column name="password">password</column>
+            <column name="email">benjamintaylor@gmail.com</column>
+            <column name="phone">9245784510</column>
+            <column name="profile_pic">user6.jpg</column>
+            <column name="add1">5-B, Rajesh Duplex, Near Sangham Char Rasta, Harni - 390211</column>
+            <column name="add2">NULL</column>
+            <column name="add3">NULL</column>
+            <column name="credits">0</column>
+        </table>
+        <table name="users">
+            <column name="user_id">10</column>
+            <column name="username">rushilprasad</column>
+            <column name="password">password</column>
+            <column name="email">default@gmail.com</column>
+            <column name="phone">8153656410</column>
+            <column name="profile_pic">user6.jpg</column>
+            <column name="add1">21 Shivam Park Society, near NEO summer school, Tarsali, Vadodara - 392100 </column>
+            <column name="add2">43-B Swayam Residence Opp Vishnu Park, Maneja, Vadodara - 390011</column>
+            <column name="add3">NULL</column>
+            <column name="credits">200</column>
+        </table>
+    </database>
+</pma_xml_export>
