@@ -183,10 +183,7 @@ while($rows=$cartTotalResult->fetch_assoc()){
                 <i class="fa-solid fa-truck-fast"></i>
                 <h3>track orders</h3>
             </div>
-            <div class="nav-box <?php if($_SESSION['accountCredits'] == 'on'){ echo "active-nav-box";}?>" id="user-credits" onClick="navOpen(this.id)">
-                <i class="fa-solid fa-credit-card"></i>
-                <h3>add credits</h3>
-            </div>
+            
             <div class="nav-box <?php if($_SESSION['accountAddress'] == 'on'){ echo "active-nav-box";}?>" id="user-address" onClick="navOpen(this.id)">
                 <i class="fa-solid fa-location-dot"></i>
                 <h3>my address</h3>
@@ -295,24 +292,7 @@ while($rows=$cartTotalResult->fetch_assoc()){
                 <input type="submit" value="track" class="btn">
             </form>
 
-            <form action="function/stripe-redirect.php" method="POST" class="user-box <?php if($_SESSION['accountCredits'] == 'on'){ echo "active-user-box";}?>" id="user-credits-box">
-                <h3>add credits</h3>
-                <p>To add credits to your store in your Pay Balance, select the amount (100, 500, 1000, 5000), and complete the payment. Your store balance will be updated instantly for convenient shopping.</p>
-                
-                <h2>your credits: <?php echo $credits?></h2>
-
-                <div class="credits-amount">
-                    <input type="radio" name="credit" id="r100" value="100" checked>
-                    <label for="r100">Rs.100</label>
-                    <input type="radio" name="credit" id="r500" value="500">
-                    <label for="r500">Rs.500</label>
-                    <input type="radio" name="credit" id="r1k" value="1000">
-                    <label for="r1k">Rs.1000</label>
-                    <input type="radio" name="credit" id="r5k" value="5000">
-                    <label for="r5k">Rs.5000</label>
-                </div>
-                <input type="submit" id="credits-payment" class="btn" value="proceed to pay">
-            </form>
+            
 
             <div class="user-box <?php if($_SESSION['accountAddress'] == 'on'){ echo "active-user-box";}?>" id="user-address-box">
                 <h3>billing address</h3>
