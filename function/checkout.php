@@ -1,251 +1,125 @@
 <?php
+include 'connection.php';
 
-// Author : Samir Khanal
-$error_message = "";
-$khalti_public_key = "your-public-api-key";
-$error_message = "";
-$successRedirect = "/"; // Change this to the success page
-$amount = isset($_POST['amount']) ? $_POST['amount'] : 0; // Amount in paisa
-$uniqueProductId = "nike-shoes";
-$uniqueUrl = "http://localhost/product/nike-shoes/";
-$uniqueProductName = "Nike shoes";
+$_SESSION['payment'] = $_POST['payment-option'];
+$_SESSION['address'] = $_POST['billing-address'];
 
-// Validate amount and ensure it's greater than 0
-if ($amount <= 0) {
-    die("Invalid amount");
-}
+if ($_SESSION['payment'] == "cash" || $_SESSION['payment'] == "credits" || $_SESSION['payment'] == "stripe-accept") {
 
-// Function to verify payment from Khalti
-function checkValid($data)
-{
-    $verifyAmount = 1000; // get amount from database and multiply by 100
-    // $data contains khalti response. you can print it to view more details.
-    // eg. $data["token] will give token & $data["amount] will give amount and more. see khalti docs for response format
-    // $error_message="";
-    // show error from above message
-    if ((float) $data["amount"] == $verifyAmount) {
-        return 1;
+    $user_id = $_SESSION['user_id'];
+
+    if ($_SESSION['payment'] == 'khalti') {
+        // Pass the total amount to Khalti page via POST
+        header("Location: ../function/khaltipayment.php?amount=" . $total);
+        exit;
+    }
+
+    if ($_SESSION['payment'] == 'stripe-accept') {
+        $address = $_SESSION['address'];
     } else {
-        return 0;
+        $address = $_POST['billing-address'];
+    }
+    if ($_SESSION['payment'] == "cash") {
+        $pmethod = "cash on delivery";
+    } else if ($_SESSION['payment'] == "credits") {
+        $pmethod = "pay balance";
+    } else if ($_SESSION['payment'] == "stripe-accept") {
+        $pmethod = "credit card";
     }
 
-    // use your extra function for checking price & all again. You can perform more action here. 
-    // 1= success, 0 = error, 
+    function generateRandomString($length = 3)
+    {
+        return substr(str_shuffle(str_repeat($x = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length / strlen($x)))), 1, $length);
+    }
+    $order_set = generateRandomString();
 
-    //
-}
-// ------------------------------------------------------------------------
-// DONOT CHANGE THE CODE BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
-// ------------------------------------------------------------------------
+    $cartTotal = "SELECT * FROM `cart` INNER JOIN `product` ON product.product_id=cart.product_id WHERE cart.user_id='$user_id';";
+    $cartTotalResult = $mysqli->query($cartTotal);
+    $subtotal = 0;
+    $tax = 0;
 
+    while ($rows = $cartTotalResult->fetch_assoc()) {
+        $tax += 4 * $rows['quantity'];
+        $subtotal += $rows['discount'] * $rows['quantity'];
+    }
 
+    $total = $subtotal + $tax;
 
-// declaring some global variables
-$token = "";
-$price = $amount;
-$mpin = "";
-// send otp
-if (isset($_POST["mobile"]) && isset($_POST["mpin"])) {
-    try {
-        $mobile = $_POST["mobile"];
-        $mpin = $_POST["mpin"];
-        $price = (float) $amount;
+    $orderAdd = "INSERT INTO `order` (`order_id`, `order_set`, `product_id`, `user_id`, `quantity`, `total`, `date`, `status`, `payment_method`, `address`, `time`) SELECT NULL, '$order_set', `product_id`, `user_id`, `quantity`, '$total', current_timestamp(), 'pending', '$pmethod', '$address', current_timestamp() FROM `cart` WHERE `user_id` = '$user_id';";
+    $orderAddResult = $mysqli->query($orderAdd);
 
-        $amount = (float) $amount * 100;
+    $cartSales = "SELECT * FROM `cart` INNER JOIN `product` ON product.product_id=cart.product_id WHERE cart.user_id='$user_id';";
+    echo "bsdk idhar kuch galat nahi";
+    $cartSalesResult = $mysqli->query($cartSales);
 
+    while ($rows = $cartSalesResult->fetch_assoc()) {
+        $sales = $rows['quantity'] + $rows['sales'];
+        $ordered = $rows['ordered'] + 1;
+        $product_id = $rows['product_id'];
 
-        $curl = curl_init();
+        $updateSales = "UPDATE `product` SET `sales` = '$sales' WHERE `product`.`product_id` = '$product_id';";
+        $updateSalesResult = $mysqli->query($updateSales);
+        $product_id = $rows['product_id'];
 
-        curl_setopt_array(
-            $curl,
-            array(
-                CURLOPT_URL => 'https://khalti.com/api/v2/payment/initiate/',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => '{
-            "public_key": "' . $khalti_public_key . '",
-            "mobile": ' . $mobile . ',
-            "transaction_pin": ' . $mpin . ',
-            "amount": ' . ($amount) . ',
-            "product_identity": "' . $uniqueProductId . '",
-            "product_name": "' . $uniqueProductName . '",
-            "product_url": "' . $uniqueUrl . '"
-    }',
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json'
-                ),
-            )
-        );
+        $updateOrdered = "UPDATE `product` SET `ordered` = '$ordered' WHERE `product`.`product_id` = '$product_id';";
+        $updateOrderedResult = $mysqli->query($updateOrdered);
+        $sales = 0;
+        $ordered = 0;
+    }
 
-        $response = curl_exec($curl);
+    $cartEmpty = "DELETE FROM `cart` WHERE `user_id` = '$user_id';";
+    $cartEmptyResult = $mysqli->query($cartEmpty);
 
-        curl_close($curl);
-        $parsed = json_decode($response, true);
+    if ($_SESSION['payment'] == 'credits') {
+        $userCredits = "SELECT * FROM `users` WHERE `user_id` = '$user_id';";
+        $userCreditsResult = $mysqli->query($userCredits);
 
-
-        if (key_exists("token", $parsed)) {
-            $token = $parsed["token"];
-
-        } else {
-            $error_message = "incorrect mobile or mpin";
-
-
-
-
+        while ($rows = $userCreditsResult->fetch_assoc()) {
+            $credits = $rows['credits'] - $total;
         }
-    } catch (Exception $e) {
-        $error_message = "incorrect mobile or mpin";
+
+        $creditUpdate = "UPDATE `users` SET `credits` = '$credits' WHERE `user_id` = '$user_id';";
+        $creditUpdateResult = $mysqli->query($creditUpdate);
 
     }
 
+    $mysqli->close();
+    header("Location:../cart.php");
+} else if ($_SESSION['payment'] == 'stripe') {
 
-}
+    $user_id = $_SESSION['user_id'];
 
-// otp verification
-if (isset($_POST["otp"]) && isset($_POST["token"]) && isset($_POST["mpin"])) {
-    try {
-        $otp = $_POST["otp"];
-        $token = $_POST["token"];
-        $mpin = $_POST["mpin"];
+    $cartStripe = "SELECT * FROM `cart` INNER JOIN `product` ON `cart`.product_id = `product`.product_id WHERE `user_id` = '$user_id';";
+    $cartStripeResult = $mysqli->query($cartStripe);
 
+    $itemsArray = array();
 
-        $curl = curl_init();
+    while ($rows = $cartStripeResult->fetch_assoc()) {
+        $stpQ = $rows['quantity'];
+        $stpD = $rows['discount'] . "00";
+        $stpP = $rows['product'];
 
-        curl_setopt_array(
-            $curl,
-            array(
-                CURLOPT_URL => 'https://khalti.com/api/v2/payment/confirm/',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => '{
-            "public_key": "' . $khalti_public_key . '",
-            "transaction_pin": ' . $mpin . ',
-            "confirmation_code": ' . $otp . ',
-            "token": "' . $token . '"
-    }',
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json'
-                ),
-            )
-        );
+        $stpQ = intval($stpQ);
+        $stpD = intval($stpD);
 
-        $response = curl_exec($curl);
+        $productSP = array("name" => "$stpP");
+        $priceSP = array("currency" => 'inr', "unit_amount" => $stpD, "product_data" => $productSP);
 
-        curl_close($curl);
-        $parsed = json_decode($response, true);
+        $items = array("quantity" => $stpQ, "price_data" => $priceSP);
 
-        if (key_exists("token", $parsed)) {
-            $isvalid = checkValid($parsed);
-            if ($isvalid) {
-                $error_message = "<span style='color:green'>payment success</span> <script> window.location='" . $successRedirect . "'; </script>";
-            }
-
-
-        } else {
-            $error_message = "couldnot process the transaction at the moment.";
-            if (key_exists("detail", $parsed)) {
-                $error_message = $parsed["detail"];
-            }
-
-        }
-    } catch (Exception $e) {
-        $error_message = "couldnot process the transaction at the moment.";
-
+        array_push($itemsArray, $items);
+    }
+    $totalAmount = $stpQ * $stpD;
+    // require_once '../function/khaltipayment.php';
+    if ($_SESSION['payment'] == 'stripe') {
+        header("Location: ../function/khaltipayment.php?amount=" . $totalAmount); // Redirect to Khalti with total amount
+        exit();
     }
 
+    http_response_code(303);
+    header("Location: " . $checkout_session->url);
 
+} else {
+    echo "\n invalid";
 }
 ?>
-
-<div class="khalticontainer">
-
-    <center>
-        <div><img src="khalti.png" alt="khalti" width="200"></div>
-    </center>
-    <?php
-    if ($token == "") {
-
-        ?>
-    <form action="pay.php" method="post">
-        <small>Mobile Number:</small> <br>
-        <input type="number" class="number" minlength="10" maxlength="10" name="mobile" placeholder="98xxxxxxxx">
-        <small>Khalti Mpin:</small> <br>
-        <input type="password" class="mpin" name="mpin" minlength="4" maxlength="6" placeholder="xxxx">
-        <small>Price:</small> <br>
-
-        <input type="text" class="price" Value="Rs. <?php echo $price; ?>" disabled>
-        <input type="hidden" class="price" name="amount" Value="<?php echo $price; ?>">
-        <br>
-        <span style="display:block;color:red;">
-            <?php echo $error_message; ?>
-        </span>
-        <button>Pay Rs.
-            <?php echo $price; ?>
-        </button>
-        <br>
-        <small>We dont store your credientials for some security reasons. You will have to reenter your details
-            everytime.</small>
-    </form>
-    <?php }
-    if ($token != "") {
-        ?>
-    <form action="pay.php" method="post">
-        <input type="hidden" name="token" value="<?php echo $token; ?>">
-        <input type="hidden" name="mpin" value="<?php echo $mpin; ?>">
-        <small>OTP:</small> <br>
-        <input type="number" value="" name="otp" placeholder="xxxx">
-        <?php
-
-            ?>
-        <span style="display:block;color:red;">
-            <?php echo $error_message; ?>
-        </span>
-        <button>pay RS.
-            <?php echo $price; ?>
-
-        </button>
-    </form>
-    <?php
-    } ?>
-</div>
-<style>
-.khalticontainer {
-    width: 300px;
-    border: 2px solid #5C2D91;
-    margin: 0 auto;
-    padding: 8px;
-}
-
-input {
-    display: block;
-    width: 98%;
-    padding: 8px;
-    margin: 2px;
-}
-
-button {
-    display: block;
-    background-color: #5C2D91;
-    border: none;
-    color: white;
-    cursor: pointer;
-
-    width: 98%;
-    padding: 8px;
-    margin: 2px;
-}
-
-button:hover {
-    opacity: 0.8;
-}
-</style>

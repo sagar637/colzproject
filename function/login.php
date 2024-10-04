@@ -5,17 +5,19 @@ $user = $_POST['username'];
 $pass = $_POST['password'];
 $op = $_POST['op'];
 
-$checkLogin = "SELECT * FROM `users` WHERE `username`='$user';"; // Note: Removed password from query
-$checkLoginResult = $mysqli->query($checkLogin);
-
-$checkRegister = "SELECT * FROM `users` WHERE `username`='$user'";
-$checkRegisterResult = $mysqli->query($checkRegister);
+// Prepare a statement to avoid SQL injection
+$stmt = $mysqli->prepare("SELECT * FROM `users` WHERE `username` = ?");
+$stmt->bind_param("s", $user);
+$stmt->execute();
+$checkLoginResult = $stmt->get_result();
 
 if ($op == 'login') {
-    if (mysqli_num_rows($checkLoginResult) == 1) {
-        $row = $checkLoginResult->fetch_assoc();
-        // Verify the password
-        if (password_verify($pass, $row['password'])) {
+    if ($checkLoginResult->num_rows == 1) {
+        $row = $checkLoginResult->fetch_assoc(); // Fetch the user's data
+
+        // Verify the entered password with the hashed password from the database
+        if (password_verify($pass, $row['password'])) { // Compare the entered password with the hash
+            // Password is correct, log the user in
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['orderReport'] = 'off';
             $_SESSION['trackReport'] = 'off';
@@ -24,37 +26,49 @@ if ($op == 'login') {
             $_SESSION['accountTrack'] = 'off';
             $_SESSION['accountOrders'] = 'off';
             $_SESSION['accountUpdate'] = 'off';
-            header('Location:../index.php');
+            header('Location: ../index.php');
+            exit(); // Ensure no further code is executed after redirection
         } else {
+            // Password is incorrect
             $_SESSION['login'] = 'on';
-            echo '<script type="text/JavaScript">history.back();</script>';
+            echo '<script type="text/javascript">alert("Incorrect password."); history.back();</script>';
+            exit(); // Ensure no further code is executed after alert
         }
     } else {
+        // Username not found
         $_SESSION['login'] = 'on';
-        echo '<script type="text/JavaScript">history.back();</script>';
+        echo '<script type="text/javascript">alert("Incorrect username."); history.back();</script>';
+        exit(); // Ensure no further code is executed after alert
     }
+
 } else if ($op == 'register') {
+    // Registration Logic
     $email = $_POST['email'];
     $phone = $_POST['phone'];
 
     if (mysqli_num_rows($checkRegisterResult) == 1) {
+        // Username already exists
         $_SESSION['register'] = 'on';
         echo '<script type="text/JavaScript">history.back();</script>';
     } else {
-        // Hash the password before storing it
+        // Hash the password
         $hashedPassword = password_hash($pass, PASSWORD_DEFAULT);
-        
-        $register = "INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `phone`, `profile_pic`, `add1`, `add2`, `add3`) VALUES (NULL, '$user', '$hashedPassword', '$email', '$phone', 'default.png', NULL, NULL, NULL);";
+
+        // Insert new user into database with hashed password
+        $register = "INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `phone`, `profile_pic`, `add1`, `add2`, `add3`) 
+                     VALUES (NULL, '$user', '$hashedPassword', '$email', '$phone', 'default.png', NULL, NULL, NULL);";
         $registerResult = $mysqli->query($register);
 
         if ($registerResult) {
-            // Fetch the newly registered user ID
+            // Fetch the newly registered user's ID
             $idRegister = "SELECT * FROM `users` WHERE `username`='$user';";
             $idRegisterResult = $mysqli->query($idRegister);
 
             while ($rows = $idRegisterResult->fetch_assoc()) {
                 $_SESSION['user_id'] = $rows['user_id'];
             }
+
+            // Set session variables for the newly registered user
             $_SESSION['orderReport'] = 'off';
             $_SESSION['trackReport'] = 'off';
             $_SESSION['accountAddress'] = 'off';

@@ -54,10 +54,11 @@ while($rows=$cartTotalResult->fetch_assoc()){
 
     <!-- header section starts -->
     <header class="header">
-    <a class="logo">
-            <img src="images/logo.png">
-            Online Grocery Store
+        <a href="" class="logo">
+            <img src="images/icon.png">
+            GardenRoots
         </a>
+
         <nav class="navbar">
             <a href="index.php">home</a>
             <a href="shop.php">shop</a>
@@ -202,64 +203,42 @@ while($rows=$cartTotalResult->fetch_assoc()){
                     ?>
                 <!-- DB DISPLAY !!!! -->
             </table>
-            
-            
             <form action="function/checkout.php" method="post" class="cart-total">
-            <span>
-                delivery address :
-                <select name="address" id="address">
-                    <option value="add1">address 1</option>
-                    <option value="add2">address 2</option>
-                    <option value="add3">address 3</option>
+                <span>
+                    delivery address : 
+                    <select name="address" id="address">
+                        <option value="add1">address 1</option>
+                        <option value="add2">address 2</option>
+                        <option value="add3">address 3</option>
+                    </select>
+                </span>
+                <?php
+                    while($rows=$addressDisplayResult->fetch_assoc()){
+                ?>
+                <input type="hidden" id="add1" value="<?php echo $rows['add1']; ?>">
+                <input type="hidden" id="add2" value="<?php echo $rows['add2']; ?>">
+                <input type="hidden" id="add3" value="<?php echo $rows['add3']; ?>">
+                <?php
+                    }
+                ?>
+                <textarea id="address-display" rows="4" maxlength="100" name="billing-address" required></textarea>
+                <div class="total-calc">
+                    <p class="total-display">subtotal: <span>Rs.<?php echo $subtotal; ?></span></p>
+                </div>
+                <div class="total-calc">
+                    <p class="total-display">tax: <span>Rs.<?php echo $tax; ?></span></p>
+                </div>
+                <div class="total-calc">
+                    <p class="total-display">total: <span>Rs.<?php echo ($tax + $subtotal); ?></span></p>
+                </div>
+                <select name="payment" id="payment" required>
+                    <option disabled>--select payment option--</option>
+                    <option selected value="cash">cash on delivery</option>
+                    <option value="stripe">Khalti card</option>
                 </select>
-            </span>
-    <textarea id="address-display" rows="4" maxlength="100" name="billing-address" required></textarea>
-
-    <div class="total-calc">
-        <p class="total-display">subtotal: <span>Rs. <?php echo $subtotal; ?></span></p>
-    </div>
-    <div class="total-calc">
-        <p class="total-display">tax: <span>Rs. <?php echo $tax; ?></span></p>
-    </div>
-    <div class="total-calc">
-        <p class="total-display">total: <span>Rs. <?php echo ($tax + $subtotal); ?></span></p>
-    </div>
-
-    <input type="hidden" id="total-amount" name="amount" value="<?php echo ($subtotal + $tax); ?>">
-
-
-    <select name="payment" id="payment" required>
-        <option disabled>--select payment option--</option>
-        <option selected value="cash">cash on delivery</option>
-        <option value="credits" <?php if ($credits < ($tax + $subtotal)) { echo "disabled"; } ?>> 
-            <?php if ($credits > ($tax + $subtotal)) { echo "use paybal ( your credits " . $credits . " )"; } else { echo "pay online"; } ?> 
-        </option>
-        <option value="khalti">Khalti</option>
-    </select>
-
-    <input type="hidden" name="payment-option" id="payment-option">
-    <input type="submit" value="checkout" class="btn" id="checkout-btn">
-</form>
-
-<!-- JavaScript to calculate and pass the total amount -->
-<script>
-    window.onload = function() {
-        // Fetch the subtotal and tax dynamically from PHP variables
-        const subtotal = parseFloat("<?php echo $subtotal; ?>");
-        const tax = parseFloat("<?php echo $tax; ?>");
-
-        // Calculate the total amount in rupees
-        const total = subtotal + tax;
-
-        // Convert the total to paisa (multiply by 100)
-        const totalInPaisa = total * 100;
-
-        // Set the value of the hidden input field to total in paisa
-        document.getElementById('total-amount').value = totalInPaisa;
-    };
-</script>
-
-
+                <input type="hidden" name="payment-option" id="payment-option">
+                <input type="submit" value="checkout" class="btn" id="checkout-btn">
+            </form>
             <?php 
                 }
                 else{

@@ -144,12 +144,20 @@ document.getElementById('resetPasswordBtn').addEventListener('click', function (
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && xhr.status == 200) {
-                alert(xhr.responseText); // Show response from PHP
+                // Show response from PHP
+                alert(xhr.responseText);
+
+                // Check if the password was successfully reset
+                if (xhr.responseText.includes('Password reset successfully')) {
+                    // Redirect to another page, e.g., login page
+                    window.location.href = 'index.php'; // or any other URL
+                }
             }
         };
         xhr.send('new_password=' + new_password + '&action=reset_password');
     }
 });
+
 </script>
 
 </body>
