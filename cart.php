@@ -182,7 +182,7 @@ while($rows=$cartTotalResult->fetch_assoc()){
                         <td class="cart-table-data">Rs.<?php echo $rows['discount']; ?></td>
                         <td class="cart-table-data">
                             <form action="function/cart-change.php" method="POST">
-                                <input type="number" name="quantity" value="<?php echo $rows['quantity']; ?>" onKeyPress="if(this.value.length==2) return false;" onchange="this.closest('form').classList.add('i-show');" oninput="if(this.value>=99) this.value=99;">
+                                <input type="number" name="quantity" value="<?php echo $rows['quantity']; ?>" onKeyPress="if(this.value.length==2) return false;" onchange="this.closest('form').classList.add('i-show');" oninput="if(this.value>=20) this.value=20;">
                                 <i onclick="this.closest('form').submit()" class="fa-solid fa-arrows-rotate"></i>
                                 <input type="hidden" name="op" value="change">
                                 <input type="hidden" name="product" value="<?php echo $rows['product_id']; ?>">
