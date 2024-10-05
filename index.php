@@ -128,7 +128,7 @@ while ($rows = $cartTotalResult->fetch_assoc()) {
             <h3>login</h3>
             <input type="text" placeholder="Username" name="username" pattern="[A-Za-z0-9]+" class="box" required
                 maxlength="30">
-            <input type="password" placeholder="Password" name="password" pattern="[A-Za-z0-9]+" class="box" required
+            <input type="password" placeholder="Password" name="password"  class="box" required
                 maxlength="30">
             <div class="remember">
                 <input type="checkbox" name="remember" id="login-remember-me">
