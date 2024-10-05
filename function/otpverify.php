@@ -17,10 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $email = $_POST['email'];
 
         // Check if the email exists
-        $checkEmail = "SELECT * FROM `users` WHERE `email`='$email'";
-        $result = $mysqli->query($checkEmail);
+        $checkEmail = "SELECT * FROM `users` WHERE `email`=?";
+        $stmt = $mysqli->prepare($checkEmail);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-        if (mysqli_num_rows($result) == 1) {
+        if ($result->num_rows == 1) {
             // Generate OTP
             $otp = random_int(100000, 999999);
 
@@ -28,18 +31,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $otp_expiration = date("Y-m-d H:i:s", strtotime('+10 minutes'));
 
             // Update the user with OTP and expiration
-            $updateOtp = "UPDATE `users` SET `otp`='$otp', `otp_expiration`='$otp_expiration' WHERE `email`='$email'";
-            $mysqli->query($updateOtp);
+            $updateOtp = "UPDATE `users` SET `otp`=?, `otp_expiration`=? WHERE `email`=?";
+            $stmt = $mysqli->prepare($updateOtp);
+            $stmt->bind_param("sss", $otp, $otp_expiration, $email);
+            $stmt->execute();
 
             // Send OTP via email using PHPMailer
             $mail = new PHPMailer(true);
             try {
-                $mail->isSMTP(); // Set mailer to use SMTP
-                $mail->CharSet = "utf-8"; // Set charset to utf8
-                $mail->SMTPAuth = true; // Enable SMTP authentication
-                $mail->SMTPSecure = 'tls'; // Enable TLS encryption, `ssl` also accepted
-                $mail->Host = 'smtp.gmail.com'; // Specify main and backup SMTP servers
-                $mail->Port = 587; // TCP port to connect to
+                $mail->isSMTP();
+                $mail->CharSet = "utf-8";
+                $mail->SMTPAuth = true;
+                $mail->SMTPSecure = 'tls';
+                $mail->Host = 'smtp.gmail.com';
+                $mail->Port = 587;
                 $mail->SMTPOptions = array(
                     'ssl' => array(
                         'verify_peer' => false,
@@ -47,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         'allow_self_signed' => true
                     )
                 );
-                $mail->isHTML(true); // Set email format to HTML
+                $mail->isHTML(true);
 
                 // SMTP credentials
                 $mail->Username = 'shivarajsedhai77@gmail.com'; // SMTP username
@@ -59,9 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $mail->Body = "Your OTP code is $otp";
                 $mail->addAddress($email);
 
-                // Enable SMTP debugging
-                // $mail->SMTPDebug = 2;
-
                 $mail->send();
                 echo "An OTP has been sent to your email.";
             } catch (Exception $e) {
@@ -70,40 +72,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             echo "No account found with this email.";
         }
+    }
 
     // Step 2: Verify OTP
-    } else if ($action == 'verify_otp') {
+    else if ($action == 'verify_otp') {
         $otp = $_POST['otp'];
+        $email = $_POST['email']; // Ensure email is passed in the form
 
         // Check if the OTP is valid and not expired
-        $checkOtp = "SELECT * FROM `users` WHERE `otp`='$otp'";
-        $result = $mysqli->query($checkOtp);
+        $checkOtp = "SELECT * FROM `users` WHERE `otp`=? AND `email`=?";
+        $stmt = $mysqli->prepare($checkOtp);
+        $stmt->bind_param("ss", $otp, $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-        if (mysqli_num_rows($result) == 1) {
-            echo "verified";
+        if ($result->num_rows == 1) {
+            // OTP verified successfully, respond with success
+            echo 'verified';
         } else {
             echo "Invalid or expired OTP.";
         }
+    }
 
     // Step 3: Reset Password
-    } else if ($action == 'reset_password') {
+    else if ($action == 'reset_password') {
         $new_password = $_POST['new_password'];
-        $email = $_POST['email']; // Ensure email is passed in the form
-
-        // Hash the new password for security
-        $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-
+        $email = $_POST['email']; 
+    
+        echo "New Password for Reset: " . htmlspecialchars($new_password) . "<br>";
+        echo "Email for Reset: " . htmlspecialchars($email) . "<br>";
+    
+        // Hash the new password for security using PASSWORD_DEFAULT
+        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+        echo "Hashed New Password: " . htmlspecialchars($hashed_password) . "<br>";
+    
         // Update password in the database
-        $updatePassword = "UPDATE `users` SET `password`='$hashed_password', `otp`=NULL, `otp_expiration`=NULL WHERE `email`='$email'";
-        if ($mysqli->query($updatePassword)) {
-            header("Location: http://localhost/Online-Grocery-Store-Using-PHP/GardenRoots/index.php");
+        $updatePassword = "UPDATE `users` SET `password`=?, `otp`=NULL, `otp_expiration`=NULL WHERE `email`=?";
+        $stmt = $mysqli->prepare($updatePassword);
+        
+        if (!$stmt) {
+            echo 'Prepare failed: (' . $mysqli->errno . ') ' . $mysqli->error;
             exit();
-        } else {
-            echo "Failed to reset password.";
         }
+    
+        $stmt->bind_param("ss", $hashed_password, $email);
+        
+        if ($stmt->execute()) {
+            echo json_encode(['status' => 'success', 'message' => 'Password reset successfully']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to reset password. Error: ' . $stmt->error]);
+        }
+        exit();
     }
+    
 }
 
 $mysqli->close();
-ob_end_flush(); 
+ob_end_flush();
 ?>

@@ -2,19 +2,8 @@
 
 include 'connection.php';
 
-// Custom hash function
-function custom_hash($password)
-{
-    $salt = '123asaaks@#$';
-    $hashed = '';
-    for ($i = 0; $i < strlen($password); $i++) {
-        $hashed .= dechex(ord($password[$i]) + ord($salt[$i % strlen($salt)]));
-    }
-    return $hashed;
-}
-
 $user = $_POST['username'];
-$pass = custom_hash($_POST['password']);
+$pass = $_POST['password'];
 $op = $_POST['op'];
 
 // Prepare a statement to avoid SQL injection
@@ -28,20 +17,21 @@ if ($op == 'login') {
     $stmt->bind_param("s", $user);
     $stmt->execute();
     $checkLoginResult = $stmt->get_result();
-    
+
+
     // Debugging: Check what username is being searched
     echo "Username: " . $user . "<br>";
-    
+
     // Debugging: Check if the query returned any rows
     echo "Number of rows returned: " . $checkLoginResult->num_rows . "<br>";
-    
+
     if ($checkLoginResult->num_rows == 1) {
+
         $row = $checkLoginResult->fetch_assoc(); // Fetch the user's data
-        echo "Hash from database: " . $row['password'] . "<br>"; // Debugging
-        
+
         // Verify the entered password with the hashed password from the database
-        if (password_verify($pass, $row['password'])) { 
-            echo "Entered password: " . $pass . "<br>"; // Debugging
+        if (password_verify($pass, $row['password'])) {
+            echo "entered from database: " . $row['password'] . "<br>";
             // Password is correct, log the user in
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['orderReport'] = 'off';
@@ -55,8 +45,13 @@ if ($op == 'login') {
             exit();
         } else {
             // Password is incorrect
+            echo "Entered Password: " . htmlspecialchars($pass) . "<br>";
+            echo "Hash from Database: " . htmlspecialchars($row['password']) . "<br>";
+            echo "Debugging: Hashing the entered password again for comparison:<br>";
+            $enteredHashed = password_hash($pass, PASSWORD_DEFAULT);
+            echo "Re-hashed Entered Password: " . htmlspecialchars($enteredHashed) . "<br>";
             $_SESSION['login'] = 'on';
-            echo '<script type="text/javascript">alert("Incorrect password."); history.back();</script>';
+            // echo '<script type="text/javascript">alert("Incorrect password."); history.back();</script>';
             exit();
         }
     } else {
@@ -65,7 +60,7 @@ if ($op == 'login') {
         echo '<script type="text/javascript">alert("Incorrect username."); history.back();</script>';
         exit();
     }
-    
+
 } else if ($op == 'register') {
     // Registration logic
     $email = $_POST['email'];
@@ -83,7 +78,7 @@ if ($op == 'login') {
         echo '<script type="text/javascript">alert("Username already exists."); history.back();</script>';
     } else {
         // Use PHP's built-in password hashing function
-        $hashedPassword = password_hash($pass, PASSWORD_DEFAULT);  // Replace custom hash
+        $hashedPassword = password_hash($pass, PASSWORD_DEFAULT);
 
         // Insert new user into the database with hashed password
         $register = "INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `phone`, `profile_pic`, `add1`, `add2`, `add3`) 
